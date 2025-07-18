@@ -10,6 +10,24 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/shopdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Timo13902025
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: shopdb
+          MYSQL_ROOT_PASSWORD: Timo13902025
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - name: Checkout repository
@@ -19,7 +37,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin' # Alternatives: 'zulu', 'oracle', 'adopt'
+          distribution: 'temurin'
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -69,6 +87,6 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          IMAGE="euginekelly/springboot-app"
+          IMAGE="classicmodelsdockerized-app"
           docker build -t $IMAGE:${{ github.run_id }} .
           docker push $IMAGE:${{ github.run_id }}
